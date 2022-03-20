@@ -1,0 +1,4 @@
+a_dictionary = {}
+for i in range(ord("a"),ord("z")+1):
+    a_dictionary[chr(i)] = i
+print(a_dictionary)
