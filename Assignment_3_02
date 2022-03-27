@@ -1,0 +1,5 @@
+def func_to_reverse(your_input):
+    your_input = your_input[::-1]
+    return your_input
+
+print(func_to_reverse("1234abcd"))
