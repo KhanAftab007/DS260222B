@@ -1,0 +1,14 @@
+def Character_finder(variable):
+    upper=0
+    lower=0
+    for char in variable:
+        if char.islower():
+           lower+=1
+        elif char.isupper():
+            upper += 1
+
+    print("Lower case Characters : ", lower)
+    print ("Upper case characters : ", upper)
+
+
+Character_finder('The quick Brown Fox')
