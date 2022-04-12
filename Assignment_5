@@ -1,0 +1,7 @@
+class define:
+
+    def f(x,n):
+
+        return pow(x,n)
+
+print(define.f(10,2))
