@@ -1,0 +1,242 @@
+import json
+import datetime
+
+def register_user(user_json,name,password,age,phn):
+    user= {
+        "id":1,
+        "name": name,
+        "password": password,
+        "age": age,
+        "phone number": phn,
+        "order history":{}
+    }
+    try:
+        file =open(user_json,"r+")
+        content=json.load(file)
+        for i in range(len(content)):
+            if content[i]["phone number"] == phn:
+                file.close()
+                return "User Already Exist! Please Log In"
+        else:
+            user["id"]=len(content)+1
+            content.append(user)
+    except json.JSONDecodeError:
+        content= []
+        content.append(user)
+    file.seek(0)
+    file.truncate()
+    json.dump(content,file, indent=4)
+    file.close()
+    return "Successfully Registered"
+
+def user_order_history(user_json,user_id):
+    file=open(user_json,"r+")
+    content= json.load(file)
+    for i in range(len(content)):
+        if content[i]["id"]==user_id:
+            print("Order History:")
+            print("Date | Order")
+            for i,j in content[i]["order History"].items():
+                print(f"{i} | {j}")
+                file.close()
+            return True
+    file.close()
+    return False
+
+
+def user_place_order(user_json, food_json, user_id, food_name, quantity):
+    date= datetime.datetime.today().strftime('%m/%d/%Y')
+    file = open(user_json,"r+")
+    content=json.load(file)
+    file1=open(food_json,"r+")
+    content1=json.load(file1)
+    for i in range(len(content1)):
+        if content1[i]["name"]==food_name:
+            if content1[i]["no of plates"]>= quantity:
+                for j in range(len(content)):
+                    if content[j]["id"]==user_id:
+                        content1[i]["no of plates"]-=quantity
+                        if date not in content[j]["order history"]:
+                            content[j]["order history"][date]=list([content1[i]["name"]])
+                        else:
+                            content[j]["order history"][date].append(content1[i]["name"])
+            else:
+                print("please enter less quantity!")
+                break
+        else:
+            print("Food is not available!")
+            break
+    file.seek(0)
+    file.truncate()
+    json.dump(content, file, indent=4)
+    file.close()
+
+    file1.seek(0)
+    file1.truncate()
+    json.dump(content1, file1, indent=4)
+    file1.close()
+
+
+
+#CRUD operation for food(Create,Read,Update,Delete)
+def add_food(food_json, food_name,no_of_plates=1):
+    food= {
+        "id":1,
+        "name":food_name,
+        "no of plates": no_of_plates,
+    }
+    try:
+        fp= open(food_json,"r+")
+        content = json.load(fp)
+        for i in range(len(content)):
+            if content[i]["name"]== food_name:
+                fp.close()
+                return "Food Already Available"
+        food["id"]=len(content)+1
+        content.append(food)
+    except json.JSONDecodeError:
+        content= []
+        content.append(food)
+    fp.seek(0)
+    fp.truncate()
+    json.dump(content,fp,indent=4)
+    fp.close()
+    return "Successfully Added the New Food"
+
+def update_food(food_json, food_id, no_of_plates):
+    file= open(food_json,"r+")
+    content= json.load(file)
+    for i in range(len(content)):
+        if (content[i]["id"]== food_id):
+            content[i]["no of plates"] +=no_of_plates
+            break
+    file.seek(0)
+    file.truncate()
+    json.dump(content, file, indent=4)
+    file.close()
+    return "Success"
+def remove_food(food_json, food_id):
+    file=open(food_json,"r+")
+    content=json.load(file)
+    for i in range(len(content)):
+        if content[i]["id"]== food_id:
+            del content[i]
+            file.seek(0)
+            file.truncate()
+            json.dump(content, file,indent=4)
+            file.close()
+            return "Successfully Deleted!!!"
+    return "Please enter Valid Id"
+
+def read_food(food_json):
+    file = open(food_json)
+    content=json.load(file)
+    print("Menu:")
+    for i in range(len(content)):
+        print("Id: ", content[i]["id"])
+        print(f"---> Name: {content[i]['name']}")
+        print(f"---> Number of Plates: {content[i]['no of plates']}")
+    file.close()
+    return True
+
+val = input("Do you want to order Food? Y/n:")
+while val.lower() =="y":
+    print("Menu:")
+    print("1) Register")
+    print("2) Log In")
+    print("3) Exit")
+    val1=input("Choose One Value From above: ")
+    if val1== "1":
+#-----------Register--------#
+        print()
+        name = input("Enter the name: ")
+        password = input("Enter the password: ")
+        age = int(input("Enter your Age"))
+        phn = input("Enter the Phn number")
+        register_user("user.json", name, password, age, phn)
+    elif val1== "2":
+#------------Log In-------------#
+     print()
+     while True:
+         print("1) User")
+         print("2) Admin")
+         print("3) Exit")
+         val2 = input("Choose on a value from above:")
+         if val2 == "1":
+             print("--------User-------")
+             user= input("Enter Username: ")
+             password = input("Enter the password")
+             file= open("user.json","r+")
+             content= json.load(file)
+             for i in range(len(content)):
+
+                if content[i]["name"] == user:
+                    if content[i]["password"] == password:
+                        while True:
+                            print()
+                            print("1) View Menu")
+                            print("2) Place New Order")
+                            print("3) Show Order History")
+                            print("4) Update Profile")
+                            val3= input("Enter Your Choice user:")
+                            if val3 == "1":
+                                read_food("food.json")
+                            elif val3== "2":
+                                us_id= input("Enter User Id")
+                                food_name= input("Enter Food")
+                                quantity = int(input("Enter the Quantity"))
+                                user_place_order("user.json", "food.json", us_id, food_name, quantity)
+                            else:
+                                print("Please Visit again!")
+                    else:
+                        print("Wrong Password")
+                else:
+                    print("Wrong Username!")
+
+         elif val2=="2":
+             print("$---------Admin--------$")
+             user = input("Enter Username: ")
+             password = input("Enter the password")
+             file=open("admin.json","r+")
+             content=json.load(file)
+             if content["name"] == user:
+                 if content["password"] == password:
+                     while True:
+                         print()
+                         print("1) Add New Food")
+                         print("2) Edit Food")
+                         print("3) View Food")
+                         print("4) Remove Food")
+                         print("5) Exit")
+                         val3= input("Enter the Choice Admin")
+                         if val3 == "1":
+                             food_name=input("Enter Food Name")
+                             no_plates= input("Enter Number of Plates")
+                             add_food("food.json",food_name, no_plates=1)
+                         elif val3 =="2":
+                             food_id = input("Enter Food Id")
+                             no_plates = input("Enter Number of Plates")
+                             update_food("food.json", food_id, no_plates=1)
+                        #implement remove and view food
+                         else:
+                             file.close()
+                             print("%%%%Bye Bye%%%%%")
+                             break
+                 else:
+                     print("Wrong Password!!")
+             else:
+                 print("Wrong Username!!")
+         else:
+             break
+    else:
+        print("Siyonara!!")
+        break
+
+# print(add_food("food.json","Dosa",10))
+# print(update_food("food.json",1,4)
+# print(remove_food("food.json",1,))
+# print(add_food("food.json","Tandoori Chicken",10))
+# read_food("food.json")
+# print(register_user("user.json","Vinay",12345,23,9787867574))
+# print(add_food("food.json","Vanilla Ice Cream",10))
+# user_place_order("user.json","food.json",3,"Vanilla Ice Cream",2)
