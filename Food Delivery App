@@ -79,11 +79,12 @@ def user_place_order(user_json, food_json, user_id, food_name, quantity):
 
 
 #CRUD operation for food(Create,Read,Update,Delete)
-def add_food(food_json, food_name,no_of_plates=1):
+def add_food(food_json, food_name,price, no_of_plates=1,):
     food= {
         "id":1,
         "name":food_name,
         "no of plates": no_of_plates,
+        "price": price,
     }
     try:
         fp= open(food_json,"r+")
@@ -103,7 +104,7 @@ def add_food(food_json, food_name,no_of_plates=1):
     fp.close()
     return "Successfully Added the New Food"
 
-def update_food(food_json, food_id, no_of_plates):
+def update_food(food_json, food_id, no_of_plates,price):
     file= open(food_json,"r+")
     content= json.load(file)
     for i in range(len(content)):
@@ -138,7 +139,6 @@ def read_food(food_json):
         print(f"---> Number of Plates: {content[i]['no of plates']}")
     file.close()
     return True
-
 val = input("Do you want to order Food? Y/n:")
 while val.lower() =="y":
     print("Menu:")
@@ -229,7 +229,7 @@ while val.lower() =="y":
          else:
              break
     else:
-        print("Siyonara!!")
+        print("Thank You, Bye!!!")
         break
 
 # print(add_food("food.json","Dosa",10))
@@ -240,3 +240,4 @@ while val.lower() =="y":
 # print(register_user("user.json","Vinay",12345,23,9787867574))
 # print(add_food("food.json","Vanilla Ice Cream",10))
 # user_place_order("user.json","food.json",3,"Vanilla Ice Cream",2)
+#print(add_food("food.json","Tandoori Chicken", 400,10))
